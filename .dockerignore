@@ -1,0 +1,7 @@
+coverage.*
+report
+node_modules
+.next
+.hermit
+**/*.Dockerfile
+.env*.local

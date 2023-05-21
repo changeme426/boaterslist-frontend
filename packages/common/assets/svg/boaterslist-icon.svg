@@ -1,0 +1,19 @@
+<svg viewBox="0 0 307 203" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="16" y="141" width="282" height="8" rx="2" fill="white"></rect>
+  <rect x="62" y="168" width="191" height="8" rx="2" fill="white"></rect>
+  <rect x="100" y="195" width="114" height="8" rx="2" fill="white"></rect>
+  <mask id="mask0" maskUnits="userSpaceOnUse" x="0" y="0" width="307" height="141">
+    <rect width="307" height="141" fill="white"></rect>
+  </mask>
+  <g mask="url(#mask0)">
+    <path
+      d="M268 132C268 193.304 218.304 243 157 243C95.6964 243 46 193.304 46 132C46 70.6964 95.6964 21 157 21C218.304 21 268 70.6964 268 132Z"
+      stroke="white" stroke-width="8"></path>
+    <path
+      d="M87.9563 131.419L92.2173 143.684C92.8754 145.579 94.6016 146.897 96.6024 147.032L196.539 153.804C198.329 153.925 200.047 153.078 201.041 151.583L227.673 111.518C230.087 107.887 227.021 103.122 222.716 103.814L91.886 124.841C88.8157 125.335 86.9359 128.481 87.9563 131.419Z"
+      stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path
+      d="M175.726 93H134.838C131.183 93 128.763 96.7932 130.304 100.108L132.988 105.883C133.861 107.761 135.801 108.906 137.866 108.764L177.873 106.005C181.595 105.748 183.735 101.654 181.821 98.4517L180.018 95.4351C179.116 93.9248 177.486 93 175.726 93Z"
+      stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+  </g>
+</svg>

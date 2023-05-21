@@ -1,0 +1,44 @@
+# Configuration file for Mega-Linter
+# See all available variables at https://nvuillam.github.io/mega-linter/configuration/ and in linters documentation
+
+PRINT_ALPACA: false
+APPLY_FIXES:
+  - TSX_ESLINT
+DEFAULT_BRANCH: main
+DISABLE:
+  - COPYPASTE
+  - TSX
+  - JAVASCRIPT
+  - TYPESCRIPT
+DISABLE_LINTERS:
+  - CREDENTIALS_SECRETLINT # TODO enable this but ignore .keys dir
+  - TYPESCRIPT_STANDARD
+  - MARKDOWN_MARKDOWN_TABLE_FORMATTER
+# - SPELL # Uncomment to disable checks of spelling mistakes
+ENABLE:
+  - CREDENTIALS
+  - GIT
+  - JSON
+  - MARKDOWN
+  - YAML
+ENABLE_LINTERS:
+  - EDITORCONFIG_EDITORCONFIG_CHECKER
+  - ENV_DOTENV_LINTER
+EXCLUDED_DIRECTORIES:
+  [
+    ".expo",
+    ".git",
+    ".hermit",
+    ".next",
+    ".vercel",
+    "compiled-lang",
+    "node_modules",
+    "report",
+    "cdk.out",
+    "ios",
+    "android",
+  ]
+FILTER_REGEX_EXCLUDE: (yarn-error.log|cdk.json|opensearch-tmp.yml)
+SHOW_ELAPSED_TIME: true
+FILEIO_REPORTER: false
+EDITORCONFIG_EDITORCONFIG_CHECKER_FILTER_REGEX_INCLUDE: .editorconfig

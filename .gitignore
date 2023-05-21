@@ -1,0 +1,23 @@
+node_modules/
+.env*.local
+
+# macOS
+.DS_Store
+
+# IDE
+.idea
+coverage
+*.log
+
+/report/
+/.hermit/
+/data/boaters-dump.sql
+/river.toml
+/river.localhost.toml
+.env
+
+.vercel
+/opensearch-tmp.yml
+/snapshots/
+junit.xml
+packages/web-app/package-lock.json

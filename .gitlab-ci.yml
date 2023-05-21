@@ -1,0 +1,127 @@
+include:
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+services:
+  - docker:20.10.12-dind
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  KANIKO_VERSION: v1.7.0-debug
+  MEGA_LINTER_VERSION: v4.46.0
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .next/cache/
+
+default:
+  #image: $CI_REGISTRY_IMAGE/builder:$CI_COMMIT_SHORT_SHA
+  image: $CI_REGISTRY_IMAGE/builder:latest
+
+# gitlab job fails:
+#   INFO[0183] Taking snapshot of full filesystem...
+#   xargs: '/kaniko/executor' terminated by signal 9
+.build-builder-kaniko:
+  stage: .pre
+  image:
+    name: gcr.io/kaniko-project/executor:$KANIKO_VERSION
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - sh ./.cicd/build-builder-opts.sh | xargs /kaniko/executor
+
+# TODO push to latest on merge to main
+build-builder:
+  stage: .pre
+  image: docker:20.10.12
+  when: manual
+  script:
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker build -f .cicd/builder.Dockerfile -t ${CI_REGISTRY_IMAGE}/builder:${CI_COMMIT_SHORT_SHA} -t ${CI_REGISTRY_IMAGE}/builder:latest --cache-from ${CI_REGISTRY_IMAGE}/builder:latest .
+    - docker push ${CI_REGISTRY_IMAGE}/builder:${CI_COMMIT_SHORT_SHA}
+    - docker push ${CI_REGISTRY_IMAGE}/builder:latest
+
+Test:
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+  script:
+    - eval "$(hermit env --activate)"
+    - cd packages/web-app
+    - make install
+    - make test
+  artifacts:
+    reports:
+      junit: packages/web-app/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: packages/web-app/coverage/cobertura-coverage.xml
+
+Lint:
+  stage: test
+  image: nvuillam/mega-linter:$MEGA_LINTER_VERSION
+  script: ["true"]
+  variables:
+    DEFAULT_WORKSPACE: $CI_PROJECT_DIR
+    DEFAULT_BRANCH: main
+  artifacts:
+    when: always
+    paths:
+      - report
+    expire_in: 1 week
+  allow_failure: true
+
+"Build Native":
+  stage: build
+  when: manual
+  script:
+    - eval "$(hermit env --activate)"
+    - make install
+    - cd packages/web-app; make test; make build
+
+"Build/Submit iOS":
+  stage: build
+  #  needs: ["build-builder"]
+  when: manual
+  script:
+    - eval "$(hermit env --activate)"
+    - make install
+    - cd packages/native-app; make build-submit-ios
+    - >
+      echo "Release created on Apple App Store Connect: https://appstoreconnect.apple.com/apps/1605256295/testflight/ios"
+
+"Build/Submit Android":
+  stage: build
+  #  needs: ["build-builder"]
+  when: manual
+  script:
+    - eval "$(hermit env --activate)"
+    - make install
+    - mkdir -p packages/native-app/.keys
+    - cp ${GOOGLE_PLAY_KEY_FILE} packages/native-app/.keys/google-play-key-development.json
+    - cd packages/native-app; make build-submit-android
+    - >
+      echo "Release created on Google Play: https://play.google.com/console/u/0/developers/6339442188529551601/app/4975378337185035148/releases/overview"
+
+.submit-native-app:
+  stage: build
+  #needs: ["build-native-app"]
+  when: manual
+  script:
+    - eval "$(hermit env --activate)"
+    - make install
+    - mkdir -p packages/native-app/.keys
+    - cp ${GOOGLE_PLAY_KEY_FILE} packages/native-app/.keys/google-play-key-development.json
+    - cd packages/native-app; make submit-android
+    - >
+      echo "Submitted to Google play. Release to testing here: https://play.google.com/console/u/0/developers/6339442188529551601/app/4975378337185035148/tracks/internal-testing"
+
+# built by vercel - TODO Note, build in gitlab pipline broken with this error:
+#   Error: Minified React error #321; visit https://reactjs.org/docs/error-decoder.html?invariant=321
+.build-web-app:
+  stage: build
+  #  needs: ["build-builder"]
+  script:
+    - eval "$(hermit env --activate)"
+    - make install
+    - cd packages/web-app; make test
+    - cd packages/web-app; make build
